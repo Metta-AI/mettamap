@@ -6,7 +6,7 @@ import { clsx } from 'clsx';
 import Link from 'next/link';
 import { useSelectedLayoutSegments } from 'next/navigation';
 
-import { type MapFile } from '@/data';
+import { type MapFile } from '@/server/types';
 
 export const MapListItem: FC<{ map: MapFile }> = ({ map }) => {
   const segments = useSelectedLayoutSegments();

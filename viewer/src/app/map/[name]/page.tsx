@@ -1,5 +1,5 @@
-import { MapViewer } from '@/components/MapViewer';
-import { getMap } from '@/data';
+import { ExtendedMapViewer } from '@/components/ExtendedMapViewer';
+import { getMap } from '@/server/getMaps';
 
 export default async function MapPage({
   params,
@@ -8,10 +8,6 @@ export default async function MapPage({
 }) {
   const name = (await params).name;
   const map = await getMap(name);
-  return (
-    <div className="p-8 flex gap-20">
-      <pre className="text-xs">{map.content.frontmatter}</pre>
-      <MapViewer data={map.content.data} />
-    </div>
-  );
+
+  return <ExtendedMapViewer map={map} />;
 }

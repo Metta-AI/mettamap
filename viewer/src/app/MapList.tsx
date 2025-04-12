@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { getMaps } from '@/data';
+import { getMaps } from '@/server/getMaps';
 
 import { MapListItem } from './MapListItem';
 
