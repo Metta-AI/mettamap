@@ -1,6 +1,8 @@
 "use client";
 import { useQueryState } from 'nuqs';
 
+import { Button } from '@/components/Button';
+
 import { parseLimitParam } from './params';
 
 export const LoadMoreButton = () => {
@@ -8,12 +10,5 @@ export const LoadMoreButton = () => {
     "limit",
     parseLimitParam.withOptions({ shallow: false })
   );
-  return (
-    <button
-      className="bg-blue-500 text-white px-4 py-2 rounded-md cursor-pointer"
-      onClick={() => setLimit(limit + 20)}
-    >
-      Load more
-    </button>
-  );
+  return <Button onClick={() => setLimit(limit + 20)}>Load more</Button>;
 };

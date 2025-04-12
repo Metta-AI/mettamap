@@ -21,9 +21,16 @@ export default async function Home({
 
   return (
     <div>
-      {maps.slice(0, limit).map((map) => (
-        <ExtendedMapViewer key={map.file} map={map} />
-      ))}
+      <div className="flex flex-col gap-4">
+        {maps.slice(0, limit).map((map) => (
+          <div
+            key={map.file}
+            className="border-2 border-gray-300 rounded-md p-4"
+          >
+            <ExtendedMapViewer map={map} />
+          </div>
+        ))}
+      </div>
       {maps.length > limit && (
         <div className="mt-8">
           <LoadMoreButton />

@@ -15,14 +15,18 @@ export function frontmatterToKeyValues(
       return;
     } else if (Array.isArray(node)) {
       for (let i = 0; i < node.length; i++) {
-        processNode(`${path}[${i}]`, node[i]);
+        processNode(`${path}.${i}`, node[i]);
       }
     } else if (typeof node === "object") {
       for (const [key, value] of Object.entries(node)) {
-        processNode(`${path}.${key}`, value);
+        processNode(path ? `${path}.${key}` : key, value);
       }
-    } else if (typeof node === "string") {
-      keyToValue[path] = node;
+    } else if (
+      typeof node === "string" ||
+      typeof node === "number" ||
+      typeof node === "boolean"
+    ) {
+      keyToValue[path] = String(node);
     }
   };
 

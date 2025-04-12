@@ -28,7 +28,8 @@ export async function getMaps(
     const mapIndex = await loadMapIndex();
     let mapFilesSet: Set<string> | undefined;
     for (const filter of filters) {
-      const mapFiles = mapIndex[filter.key][filter.value];
+      const mapFiles = mapIndex[filter.key]?.[filter.value] ?? [];
+      console.log(filter, mapFiles);
       mapFilesSet = mapFilesSet
         ? mapFilesSet.intersection(new Set(mapFiles))
         : new Set(mapFiles);
