@@ -59,6 +59,7 @@ const NewFilter: FC<{
       <div className="flex gap-2 items-center">
         <div className="flex-1">
           <Select
+            autoFocus
             classNames={{
               control: () => "h-6",
             }}
@@ -84,6 +85,7 @@ const NewFilter: FC<{
       <div className="text-xs font-mono">{state.key}</div>
       <div className="flex-1">
         <Select
+          autoFocus
           classNames={{
             control: () => "h-6",
           }}

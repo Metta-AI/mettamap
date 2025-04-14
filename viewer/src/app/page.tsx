@@ -21,6 +21,10 @@ export default async function Home({
 
   return (
     <div>
+      <div className="mb-4 text-sm text-gray-600">
+        Total maps: <span className="font-semibold">{maps.length}</span>
+      </div>
+
       <div className="flex flex-col gap-4">
         {maps.slice(0, limit).map((map) => (
           <div

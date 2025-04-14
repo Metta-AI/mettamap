@@ -88,12 +88,17 @@ export const ExtendedMapViewer: FC<{ map: MapFile }> = ({ map }) => {
     return (
       <div
         key={fullKey}
-        className={`cursor-pointer hover:bg-blue-100 p-1 rounded ${
+        className={`cursor-pointer hover:bg-blue-100 px-1 py-0.5 rounded font-mono ${
           isActive ? "bg-blue-200" : ""
         }`}
         onClick={() => handleFrontmatterClick(fullKey, String(value))}
       >
-        <span className="font-bold">{key}:</span> {String(value)}
+        <span className="font-bold">{key}:</span>{" "}
+        <span className="whitespace-pre-wrap">
+          {typeof value === "string" && value.includes("\n")
+            ? "\n" + value
+            : String(value)}
+        </span>
       </div>
     );
   };
@@ -111,14 +116,16 @@ export const ExtendedMapViewer: FC<{ map: MapFile }> = ({ map }) => {
   };
 
   return (
-    <div className="grid grid-cols-3 gap-8">
-      <div className="text-xs overflow-auto max-h-[80vh] w-[400px] border border-gray-200 rounded p-4">
+    <div className="grid grid-cols-[400px_1fr_250px] gap-8">
+      <div className="text-xs overflow-auto max-h-[80vh] border border-gray-200 rounded p-4 bg-gray-50">
         {Object.entries(frontmatterData).map(([key, value]) =>
           renderFrontmatterLine(key, value)
         )}
       </div>
-      <div className="col-span-1">
-        <MapViewer data={map.content.data} />
+      <div className="flex flex-col items-center justify-start overflow-auto">
+        <div className="max-w-full">
+          <MapViewer data={map.content.data} />
+        </div>
       </div>
       <div className="flex flex-col items-center justify-start">
         <Button onClick={copyMapDataToClipboard}>

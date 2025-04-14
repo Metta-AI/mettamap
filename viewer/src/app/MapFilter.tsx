@@ -8,8 +8,8 @@ export const MapFilter: FC = async () => {
   const mapIndex = await loadMapIndex();
 
   return (
-    <div className="bg-white p-4 border-b">
-      <div className="px-8">
+    <div className="bg-white border-b">
+      <div className="px-8 py-4">
         <InnerMapFilter mapIndex={mapIndex} />
       </div>
     </div>
