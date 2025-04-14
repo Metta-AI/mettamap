@@ -1,7 +1,11 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  outputFileTracingIncludes: {
+    "/": ["./public/maps/**/*"],
+    "/maps/[name]": ["./public/maps/**/*"],
+    "**": ["./public/maps/**/*"],
+  },
 };
 
 export default nextConfig;
