@@ -1,5 +1,7 @@
 import './globals.css';
 
+import { Suspense } from 'react';
+
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
@@ -18,15 +20,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <NuqsAdapter>
-          <div className="px-8 py-2 font-bold border-b border-gray-200 bg-gray-100">
-            <Link href="/">MettaMap Viewer</Link>
-          </div>
-          <div>
-            <MapFilter />
-            <div className="p-8">{children}</div>
-          </div>
-        </NuqsAdapter>
+        <Suspense>
+          <NuqsAdapter>
+            <div className="px-8 py-2 font-bold border-b border-gray-200 bg-gray-100">
+              <Link href="/">MettaMap Viewer</Link>
+            </div>
+            <div>
+              <MapFilter />
+              <div className="p-8">{children}</div>
+            </div>
+          </NuqsAdapter>
+        </Suspense>
       </body>
     </html>
   );
