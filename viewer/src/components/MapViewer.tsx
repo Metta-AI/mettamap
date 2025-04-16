@@ -1,19 +1,124 @@
 "use client";
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react';
 
+const asciiToObjectType = {
+  "#": "wall",
+  A: "agent",
+  C: "converter",
+  g: "mine",
+  c: "generator",
+  a: "altar",
+  r: "armory",
+  l: "lasery",
+  b: "lab",
+  f: "factory",
+  t: "temple",
+  v: "converter",
+} as const;
+
+type ObjectType = (typeof asciiToObjectType)[keyof typeof asciiToObjectType];
+
+type ItemObjectType = Exclude<ObjectType, "wall" | "agent">;
+
+const objectTypeToItemTile = {
+  converter: [0, 0],
+  mine: [14, 2],
+  generator: [2, 2],
+  altar: [12, 2],
+  armory: [6, 3],
+  lasery: [5, 5],
+  lab: [5, 1],
+  factory: [13, 0],
+  temple: [7, 2],
+} satisfies Record<ItemObjectType, [number, number]>;
+
+function isValidAscii(c: string): c is keyof typeof asciiToObjectType {
+  return c in asciiToObjectType;
+}
+
+class Sprites {
+  wall: HTMLImageElement;
+  items: HTMLImageElement;
+  monsters: HTMLImageElement;
+
+  constructor(
+    wall: HTMLImageElement,
+    items: HTMLImageElement,
+    monsters: HTMLImageElement
+  ) {
+    this.wall = wall;
+    this.items = items;
+    this.monsters = monsters;
+  }
+
+  draw(
+    item: ObjectType,
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    size: number
+  ) {
+    switch (item) {
+      case "wall":
+        ctx.drawImage(this.wall, x, y, size, size);
+        break;
+      case "agent":
+        ctx.drawImage(this.monsters, 0, 0, 16, 16, x, y, size, size);
+        break;
+      default:
+        const [tileX, tileY] = objectTypeToItemTile[item];
+        ctx.drawImage(
+          this.items,
+          tileX * 16,
+          tileY * 16,
+          16,
+          16,
+          x,
+          y,
+          size,
+          size
+        );
+        break;
+    }
+  }
+}
+
+async function loadImages(): Promise<Sprites> {
+  const loadImage = (src: string) => {
+    return new Promise<HTMLImageElement>((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.src = src;
+      return img;
+    });
+  };
+  const [wall, items, monsters] = await Promise.all([
+    loadImage("/assets/wall.png"),
+    loadImage("/assets/items.png"),
+    loadImage("/assets/monsters.png"),
+  ]);
+  const sprites = new Sprites(wall, items, monsters);
+  return sprites;
+}
+
 export const MapViewer = ({ data }: { data: string }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [cellSize, setCellSize] = useState(10);
 
-  useEffect(() => {
+  const [sprites, setSprites] = useState<Sprites | null>(null);
+
+  const draw = useCallback(() => {
+    console.log("draw");
+    if (!sprites) return;
+    if (!canvasRef.current || !containerRef.current) return;
+
+    // Re-render the map with the new cell size
     const canvas = canvasRef.current;
-    if (!canvas) return;
-
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -22,63 +127,22 @@ export const MapViewer = ({ data }: { data: string }) => {
     const width = Math.max(...lines.map((line) => line.length));
     const height = lines.length;
 
-    // Calculate appropriate cell size based on container dimensions
-    const calculateCellSize = () => {
-      if (!containerRef.current) return 10;
+    // Calculate new cell size
+    const containerWidth = containerRef.current.clientWidth;
+    const containerHeight = containerRef.current.clientHeight;
 
-      const containerWidth = containerRef.current.clientWidth;
-      const containerHeight = containerRef.current.clientHeight;
+    const widthBasedSize = Math.floor(containerWidth / width);
+    const heightBasedSize = Math.floor(containerHeight / height);
 
-      // Calculate cell size based on both dimensions
-      const widthBasedSize = Math.floor(containerWidth / width);
-      const heightBasedSize = Math.floor(containerHeight / height);
-
-      // Use the smaller of the two to ensure the map fits in both dimensions
-      const newCellSize = Math.min(widthBasedSize, heightBasedSize);
-
-      // Set a minimum cell size to ensure readability
-      return Math.max(10, newCellSize);
-    };
-
-    // Set initial cell size
-    const initialCellSize = calculateCellSize();
-    setCellSize(initialCellSize);
+    const cellSize = Math.max(24, Math.min(widthBasedSize, heightBasedSize));
 
     // Set canvas dimensions
-    canvas.width = width * initialCellSize;
-    canvas.height = height * initialCellSize;
+    canvas.width = width * cellSize;
+    canvas.height = height * cellSize;
 
     // Clear canvas
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "rgb(6, 24, 24)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw the map
-    ctx.fillStyle = "black";
-    lines.forEach((line, y) => {
-      for (let x = 0; x < line.length; x++) {
-        if (line[x] === "#") {
-          ctx.fillRect(
-            x * initialCellSize,
-            y * initialCellSize,
-            initialCellSize,
-            initialCellSize
-          );
-        }
-        // draw characters for non-blank cells
-        else if (line[x] !== " ") {
-          ctx.fillStyle = "red";
-          ctx.font = `${Math.max(8, initialCellSize * 0.8)}px Arial`;
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(
-            line[x],
-            x * initialCellSize + initialCellSize / 2,
-            y * initialCellSize + initialCellSize / 2
-          );
-          ctx.fillStyle = "black";
-        }
-      }
-    });
 
     // Draw grid lines
     ctx.strokeStyle = "#ddd";
@@ -87,118 +151,90 @@ export const MapViewer = ({ data }: { data: string }) => {
     // Draw vertical grid lines
     for (let x = 0; x <= width; x++) {
       ctx.beginPath();
-      ctx.moveTo(x * initialCellSize, 0);
-      ctx.lineTo(x * initialCellSize, canvas.height);
+      ctx.moveTo(x * cellSize, 0);
+      ctx.lineTo(x * cellSize, canvas.height);
       ctx.stroke();
     }
 
     // Draw horizontal grid lines
     for (let y = 0; y <= height; y++) {
       ctx.beginPath();
-      ctx.moveTo(0, y * initialCellSize);
-      ctx.lineTo(canvas.width, y * initialCellSize);
+      ctx.moveTo(0, y * cellSize);
+      ctx.lineTo(canvas.width, y * cellSize);
       ctx.stroke();
     }
-  }, [data]);
+
+    // Draw the map
+    ctx.fillStyle = "black";
+    lines.forEach((line, y) => {
+      for (let x = 0; x < line.length; x++) {
+        const char = line[x];
+        if (isValidAscii(char)) {
+          const objectType = asciiToObjectType[char];
+          sprites.draw(objectType, ctx, x * cellSize, y * cellSize, cellSize);
+        }
+        // else: show error?
+      }
+    });
+  }, [sprites]);
 
   // Handle window resize
   useEffect(() => {
-    const handleResize = () => {
-      if (!canvasRef.current || !containerRef.current) return;
+    window.addEventListener("resize", draw);
+    return () => window.removeEventListener("resize", draw);
+  }, [draw]);
 
-      // Re-render the map with the new cell size
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
+  useEffect(() => {
+    draw();
+  }, [draw]);
 
-      // Parse the data
-      const lines = data.trim().split("\n");
-      const width = Math.max(...lines.map((line) => line.length));
-      const height = lines.length;
+  useEffect(() => {
+    loadImages().then(setSprites);
+  }, []);
 
-      // Calculate new cell size
-      const containerWidth = containerRef.current.clientWidth;
-      const containerHeight = containerRef.current.clientHeight;
+  // Benchmark: uncomment to redraw 60 frames per second when the canvas is visible on screen
 
-      const widthBasedSize = Math.floor(containerWidth / width);
-      const heightBasedSize = Math.floor(containerHeight / height);
+  /*
+     useEffect(() => {
+       let interval: NodeJS.Timeout | null = null;
 
-      const newCellSize = Math.max(
-        5,
-        Math.min(widthBasedSize, heightBasedSize)
-      );
-      setCellSize(newCellSize);
+       // Only redraw if the canvas is visible on screen
+       const observer = new IntersectionObserver((entries) => {
+         const [entry] = entries;
+         if (entry.isIntersecting) {
+           console.log("visible");
+           // Start animation loop when visible
+           interval = setInterval(draw, 1000 / 60);
+         } else {
+           console.log("hidden");
+           if (interval) {
+             clearInterval(interval);
+           }
+           interval = null;
+         }
+       });
 
-      // Set canvas dimensions
-      canvas.width = width * newCellSize;
-      canvas.height = height * newCellSize;
+       if (canvasRef.current) {
+         observer.observe(canvasRef.current);
+       }
 
-      // Clear canvas
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw the map
-      ctx.fillStyle = "black";
-      lines.forEach((line, y) => {
-        for (let x = 0; x < line.length; x++) {
-          if (line[x] === "#") {
-            ctx.fillRect(
-              x * newCellSize,
-              y * newCellSize,
-              newCellSize,
-              newCellSize
-            );
-          }
-          // draw characters for non-blank cells
-          else if (line[x] !== " ") {
-            ctx.fillStyle = "red";
-            ctx.font = `${Math.max(8, newCellSize * 0.8)}px Arial`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(
-              line[x],
-              x * newCellSize + newCellSize / 2,
-              y * newCellSize + newCellSize / 2
-            );
-            ctx.fillStyle = "black";
-          }
-        }
-      });
-
-      // Draw grid lines
-      ctx.strokeStyle = "#ddd";
-      ctx.lineWidth = 0.5;
-
-      // Draw vertical grid lines
-      for (let x = 0; x <= width; x++) {
-        ctx.beginPath();
-        ctx.moveTo(x * newCellSize, 0);
-        ctx.lineTo(x * newCellSize, canvas.height);
-        ctx.stroke();
-      }
-
-      // Draw horizontal grid lines
-      for (let y = 0; y <= height; y++) {
-        ctx.beginPath();
-        ctx.moveTo(0, y * newCellSize);
-        ctx.lineTo(canvas.width, y * newCellSize);
-        ctx.stroke();
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [data]);
+       return () => {
+         if (canvasRef.current) {
+           observer.disconnect();
+         }
+         if (interval) {
+           clearInterval(interval);
+         }
+       };
+     }, [draw]);
+     */
 
   return (
     <div
       ref={containerRef}
       className="w-full h-full flex items-center justify-center overflow-hidden"
     >
-      <canvas
-        ref={canvasRef}
-        style={{ border: "1px solid #ccc", maxWidth: "100%" }}
-      />
+      <canvas ref={canvasRef} className="border border-gray-300 max-w-full" />
     </div>
   );
 };
