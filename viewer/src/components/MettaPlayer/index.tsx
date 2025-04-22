@@ -9,106 +9,23 @@ import {
   useState,
 } from 'react';
 
-import { z } from 'zod';
-
 import { Button } from '../Button';
 import { MapViewer } from '../MapViewer';
 import { objectsToMap } from './objectsToMap';
-
-const messageSchema = z.discriminatedUnion("type", [
-  z.object({
-    type: z.literal("message"),
-    message: z.string(),
-  }),
-  z.object({
-    type: z.literal("error"),
-    message: z.string(),
-  }),
-  z.object({
-    type: z.literal("initial_state"),
-    info: z.unknown(),
-    objects: z.unknown(),
-  }),
-  z.object({
-    type: z.literal("step_results"),
-    info: z.unknown(),
-    objects: z.unknown(),
-  }),
-]);
-
-type Message = z.infer<typeof messageSchema>;
-
-type Command = {
-  type: "step";
-};
-
-class MettaSocket {
-  socket: WebSocket;
-  private onError: (error: string) => void;
-  private onMessage: (message: Message) => void;
-
-  constructor(params: {
-    args: string;
-    env: string;
-    onError: (error: string) => void;
-    onMessage: (message: Message) => void;
-  }) {
-    this.onError = params.onError;
-    this.onMessage = params.onMessage;
-
-    const endpoint = `ws://localhost:8000/ws`;
-    const queryParams = new URLSearchParams({
-      args: params.args,
-      env: params.env,
-    });
-    const socket = new WebSocket(`${endpoint}?${queryParams.toString()}`);
-    socket.onmessage = function (event) {
-      const data = messageSchema.parse(JSON.parse(event.data));
-      if (data.type === "error") {
-        params.onError(data.message);
-      } else {
-        params.onMessage(data);
-      }
-    };
-    socket.onopen = function () {
-      params.onMessage({
-        type: "message",
-        message: "[local] Connected to WebSocket",
-      });
-    };
-    socket.onclose = function () {
-      params.onMessage({
-        type: "message",
-        message: "[local] Disconnected from WebSocket",
-      });
-    };
-
-    this.socket = socket;
-  }
-
-  sendCommand(command: Command) {
-    if (this.socket.readyState !== WebSocket.OPEN) {
-      this.onError("[local] Not connected to WebSocket");
-    }
-    this.socket.send(JSON.stringify(command));
-  }
-
-  close() {
-    if (this.socket.readyState === WebSocket.OPEN) {
-      this.socket.close();
-    }
-  }
-}
+import {
+  MettagridMessage,
+  MettagridSocket,
+} from './socket';
 
 type PlayerState = {
-  messages: Message[];
+  messages: MettagridMessage[];
   map?: string;
   step: number;
 };
 
 type PlayerAction = {
   type: "add_message";
-  message: Message;
+  message: MettagridMessage;
 };
 
 const playerReducer: Reducer<PlayerState, PlayerAction> = (
@@ -142,7 +59,7 @@ function usePlayerReducer(initialState: PlayerState) {
   return [state, dispatch] as const;
 }
 
-const MessagesViewer: FC<{ messages: Message[] }> = ({ messages }) => {
+const MessagesViewer: FC<{ messages: MettagridMessage[] }> = ({ messages }) => {
   return (
     <div>
       {messages.map((message, i) => (
@@ -155,7 +72,7 @@ const MessagesViewer: FC<{ messages: Message[] }> = ({ messages }) => {
 };
 
 export const MettaPlayer: FC = () => {
-  const [socket, setSocket] = useState<MettaSocket | null>(null);
+  const [socket, setSocket] = useState<MettagridSocket | null>(null);
 
   const [state, dispatch] = usePlayerReducer({
     messages: [],
@@ -168,7 +85,7 @@ export const MettaPlayer: FC = () => {
       if (socket) {
         socket.close();
       }
-      return new MettaSocket({
+      return new MettagridSocket({
         args: "+user=berekuk",
         env: "simple",
         onError: (error) => {
@@ -186,7 +103,7 @@ export const MettaPlayer: FC = () => {
 
   useEffect(() => {
     if (socket) {
-      // helps with React strict mode
+      // helps with React strict mode in dev
       return;
     }
     connect();
