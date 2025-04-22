@@ -12,7 +12,7 @@ import { MapIndex } from '@/server/loadMapIndex';
 import {
   FilterItem,
   parseFilterParam,
-} from './params';
+} from '../params';
 
 const FilterPair: FC<{
   filter: FilterItem;

@@ -113,7 +113,6 @@ export const MapViewer = ({ data }: { data: string }) => {
   const [sprites, setSprites] = useState<Sprites | null>(null);
 
   const draw = useCallback(() => {
-    console.log("draw");
     if (!sprites) return;
     if (!canvasRef.current || !containerRef.current) return;
 
@@ -176,7 +175,7 @@ export const MapViewer = ({ data }: { data: string }) => {
         // else: show error?
       }
     });
-  }, [sprites]);
+  }, [sprites, data]);
 
   // Handle window resize
   useEffect(() => {
@@ -230,11 +229,11 @@ export const MapViewer = ({ data }: { data: string }) => {
      */
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full h-full flex items-center justify-center overflow-hidden"
-    >
-      <canvas ref={canvasRef} className="border border-gray-300 max-w-full" />
+    <div ref={containerRef} className="w-full h-full">
+      <canvas
+        ref={canvasRef}
+        className="border border-gray-300 max-w-full max-h-full mx-auto"
+      />
     </div>
   );
 };
