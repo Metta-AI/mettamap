@@ -27,7 +27,7 @@ export default async function MapsPage({
             key={map.file}
             className="rounded-md border-2 border-gray-300 p-4"
           >
-            <ExtendedMapViewer map={map} />
+            <ExtendedMapViewer mapFile={map} />
           </div>
         ))}
       </div>

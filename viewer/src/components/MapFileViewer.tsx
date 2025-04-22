@@ -12,6 +12,7 @@ import {
   FilterItem,
   parseFilterParam,
 } from "@/app/params";
+import { MettaMap } from "@/lib/MettaMap";
 import { MapFile } from "@/server/types";
 
 import { CopyToClipboardButton } from "./CopyToClipboardButton";
@@ -106,16 +107,21 @@ const FrontmatterViewer: FC<{ frontmatter: Record<string, unknown> }> = ({
   );
 };
 
-export const ExtendedMapViewer: FC<{ map: MapFile }> = ({ map }) => {
+export const ExtendedMapViewer: FC<{ mapFile: MapFile }> = ({ mapFile }) => {
   // Parse the frontmatter YAML
   const frontmatterData = useMemo(() => {
     try {
-      return yaml.load(map.content.frontmatter) as Record<string, unknown>;
+      return yaml.load(mapFile.content.frontmatter) as Record<string, unknown>;
     } catch (error) {
       console.error("Error parsing frontmatter:", error);
       return {};
     }
-  }, [map.content.frontmatter]);
+  }, [mapFile.content.frontmatter]);
+
+  const map = useMemo(
+    () => MettaMap.fromAscii(mapFile.content.data),
+    [mapFile.content.data]
+  );
 
   return (
     <div className="grid grid-cols-[400px_1fr_250px] gap-8">
@@ -124,10 +130,10 @@ export const ExtendedMapViewer: FC<{ map: MapFile }> = ({ map }) => {
       </div>
       <div className="flex flex-col items-center justify-start overflow-auto">
         <div className="max-w-full">
-          <MapViewer data={map.content.data} />
+          <MapViewer map={map} />
         </div>
       </div>
-      <CopyToClipboardButton text={map.content.data}>
+      <CopyToClipboardButton text={mapFile.content.data}>
         Copy Map Data to Clipboard
       </CopyToClipboardButton>
     </div>

@@ -9,5 +9,5 @@ export default async function MapPage({
   const name = (await params).name;
   const map = await getMap(name);
 
-  return <ExtendedMapViewer map={map} />;
+  return <ExtendedMapViewer mapFile={map} />;
 }

@@ -1,7 +1,7 @@
 import {
   ItemObjectType,
   ObjectType,
-} from "./drawMap";
+} from "@/lib/MettaMap";
 
 const objectTypeToItemTile = {
   converter: [0, 0],
@@ -38,6 +38,8 @@ export class Sprites {
     size: number
   ) {
     switch (item) {
+      case "empty":
+        return;
       case "wall":
         ctx.drawImage(this.wall, x, y, size, size);
         break;

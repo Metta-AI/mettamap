@@ -6,6 +6,8 @@ import {
   useState,
 } from "react";
 
+import { MettaMap } from "@/lib/MettaMap";
+
 import { usePanZoom } from "../../hooks/use-pan-and-zoom";
 import { drawMap } from "./drawMap";
 import {
@@ -13,7 +15,7 @@ import {
   Sprites,
 } from "./sprites";
 
-export const MapViewer = ({ data }: { data: string }) => {
+export const MapViewer = ({ map }: { map: MettaMap }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -33,13 +35,13 @@ export const MapViewer = ({ data }: { data: string }) => {
     const containerHeight = containerRef.current.clientHeight;
 
     drawMap({
-      data,
+      map,
       canvas: canvasRef.current,
       containerWidth,
       containerHeight,
       sprites,
     });
-  }, [sprites, data]);
+  }, [sprites, map]);
 
   // Handle window resize
   useEffect(() => {
