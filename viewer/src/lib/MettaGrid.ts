@@ -37,7 +37,7 @@ function isValidAscii(c: string): c is keyof typeof asciiToObjectType {
   return c in asciiToObjectType;
 }
 
-export class MettaMap {
+export class MettaGrid {
   constructor(
     private readonly data: {
       width: number;
@@ -62,7 +62,7 @@ export class MettaMap {
         objects[y][x] = objectType;
       });
     });
-    return new MettaMap({ width, height, objects });
+    return new MettaGrid({ width, height, objects });
   }
 
   // TODO - make MettaMap data immutable with immutable.js and evolve it by applying objects as a patch
@@ -99,7 +99,7 @@ export class MettaMap {
       map[r][c] = object;
     }
 
-    return new MettaMap({ width, height, objects: map });
+    return new MettaGrid({ width, height, objects: map });
   }
 
   object(x: number, y: number): ObjectType {

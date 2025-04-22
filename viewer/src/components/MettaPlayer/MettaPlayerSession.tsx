@@ -7,7 +7,7 @@ import {
   useState,
 } from "react";
 
-import { MettaMap } from "@/lib/MettaMap";
+import { MettaGrid } from "@/lib/MettaGrid";
 
 import { Button } from "../Button";
 import { MapViewer } from "../MapViewer";
@@ -19,7 +19,7 @@ import {
 
 type PlayerState = {
   messages: MettagridMessage[];
-  map?: MettaMap;
+  map?: MettaGrid;
   step: number;
 };
 
@@ -41,13 +41,13 @@ const playerReducer: Reducer<PlayerState, PlayerAction> = (
           return {
             ...state,
             messages: [...state.messages, action.message].slice(-MAX_MESSAGES),
-            map: MettaMap.fromWebsocketObjects(action.message.objects),
+            map: MettaGrid.fromWebsocketObjects(action.message.objects),
           };
         case "step_results":
           return {
             ...state,
             messages: [...state.messages, action.message].slice(-MAX_MESSAGES),
-            map: MettaMap.fromWebsocketObjects(action.message.objects),
+            map: MettaGrid.fromWebsocketObjects(action.message.objects),
             step: state.step + 1,
           };
         default:
@@ -109,7 +109,7 @@ export const MettaPlayerSession: FC<{ args: string }> = ({ args }) => {
     <div className="flex h-full min-h-0 flex-col">
       <div className="grid min-h-0 flex-1 grid-cols-2 gap-4">
         <div className="min-h-0 overflow-auto">
-          {state.map && <MapViewer map={state.map} />}
+          {state.map && <MapViewer grid={state.map} />}
         </div>
         <div className="flex flex-col gap-4">
           <div className="flex flex-row items-center gap-4">

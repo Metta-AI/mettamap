@@ -1,7 +1,7 @@
 import {
   ItemObjectType,
   ObjectType,
-} from "@/lib/MettaMap";
+} from "@/lib/MettaGrid";
 
 const objectTypeToItemTile = {
   converter: [0, 0],

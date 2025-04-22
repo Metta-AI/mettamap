@@ -12,7 +12,7 @@ import {
   FilterItem,
   parseFilterParam,
 } from "@/app/params";
-import { MettaMap } from "@/lib/MettaMap";
+import { MettaGrid } from "@/lib/MettaGrid";
 import { MapFile } from "@/server/types";
 
 import { CopyToClipboardButton } from "./CopyToClipboardButton";
@@ -118,8 +118,8 @@ export const ExtendedMapViewer: FC<{ mapFile: MapFile }> = ({ mapFile }) => {
     }
   }, [mapFile.content.frontmatter]);
 
-  const map = useMemo(
-    () => MettaMap.fromAscii(mapFile.content.data),
+  const grid = useMemo(
+    () => MettaGrid.fromAscii(mapFile.content.data),
     [mapFile.content.data]
   );
 
@@ -130,7 +130,7 @@ export const ExtendedMapViewer: FC<{ mapFile: MapFile }> = ({ mapFile }) => {
       </div>
       <div className="flex flex-col items-center justify-start overflow-auto">
         <div className="max-w-full">
-          <MapViewer map={map} />
+          <MapViewer grid={grid} />
         </div>
       </div>
       <CopyToClipboardButton text={mapFile.content.data}>
