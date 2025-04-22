@@ -1,149 +1,68 @@
 "use client";
-
 import {
   FC,
-  Reducer,
-  useCallback,
-  useEffect,
-  useReducer,
+  PropsWithChildren,
   useState,
 } from "react";
 
 import { Button } from "../Button";
-import { MapViewer } from "../MapViewer";
-import { objectsToMap } from "./objectsToMap";
-import {
-  MettagridMessage,
-  MettagridSocket,
-} from "./socket";
+import { TextInput } from "../TextInput";
+import { MettaPlayerSession } from "./MettaPlayerSession";
 
-type PlayerState = {
-  messages: MettagridMessage[];
-  map?: string;
-  step: number;
-};
-
-type PlayerAction = {
-  type: "add_message";
-  message: MettagridMessage;
-};
-
-const MAX_MESSAGES = 20; // would run out of memory in long sessions otherwise
-
-const playerReducer: Reducer<PlayerState, PlayerAction> = (
-  state: PlayerState,
-  action: PlayerAction
-) => {
-  switch (action.type) {
-    case "add_message":
-      switch (action.message.type) {
-        case "initial_state":
-          return {
-            ...state,
-            messages: [...state.messages, action.message].slice(-MAX_MESSAGES),
-            map: objectsToMap(action.message.objects),
-          };
-        case "step_results":
-          return {
-            ...state,
-            messages: [...state.messages, action.message].slice(-MAX_MESSAGES),
-            map: objectsToMap(action.message.objects),
-            step: state.step + 1,
-          };
-        default:
-          return state;
-      }
-  }
-};
-
-function usePlayerReducer(initialState: PlayerState) {
-  const [state, dispatch] = useReducer(playerReducer, initialState);
-  return [state, dispatch] as const;
-}
-
-const MessagesViewer: FC<{ messages: MettagridMessage[] }> = ({ messages }) => {
+const TopPanel: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <div>
-      {messages.map((message, i) => (
-        <p key={i} className="font-mono text-xs">
-          {message.type}
-        </p>
-      ))}
+    <div className="grid h-16 items-center border-b border-gray-200 bg-gray-100 px-8 py-2">
+      {children}
     </div>
   );
 };
 
 export const MettaPlayer: FC = () => {
-  const [socket, setSocket] = useState<MettagridSocket | null>(null);
-
-  const [state, dispatch] = usePlayerReducer({
-    messages: [],
-    map: "",
-    step: 0,
-  });
-
-  const connect = useCallback(() => {
-    setSocket((socket) => {
-      if (socket) {
-        socket.close();
+  const [runningState, setRunningState] = useState<
+    | {
+        mode: "idle";
       }
-      return new MettagridSocket({
-        args: "+user=berekuk",
-        env: "simple",
-        onError: (error) => {
-          dispatch({
-            type: "add_message",
-            message: { type: "error", message: "[ERROR] " + error },
-          });
-        },
-        onMessage: (message) => {
-          dispatch({ type: "add_message", message });
-        },
-      });
-    });
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (socket) {
-      // helps with React strict mode in dev
-      return;
-    }
-    connect();
-  }, [connect, socket]);
-
-  // // benchmark: run as fast as possible
-  // useEffect(() => {
-  //   if (state.map && socket) {
-  //     socket.sendCommand({ type: "step" });
-  //   }
-  // }, [socket, state.step]);
+    | {
+        mode: "running";
+        args: string;
+      }
+  >({ mode: "idle" });
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex flex-row gap-4">
-        {socket?.socket.readyState === WebSocket.OPEN ? (
-          <>
-            <form
-              action={() => {
-                socket?.sendCommand({ type: "step" });
-              }}
-            >
-              <Button type="submit">Step</Button>
-            </form>
-            <div>Step: {state.step}</div>
-          </>
-        ) : (
-          <div>Connecting...</div>
+      <TopPanel>
+        {runningState.mode === "idle" && (
+          <form
+            action={(formData) => {
+              setRunningState({
+                mode: "running",
+                args: formData.get("args") as string,
+              });
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <TextInput name="args" placeholder="Hydra args" />
+              <Button type="submit">Start</Button>
+            </div>
+          </form>
         )}
-      </div>
-      <div className="grid min-h-0 flex-1 grid-cols-2 gap-4">
-        <div className="min-h-0">
-          {state.map && <MapViewer data={state.map} />}
+        {runningState.mode === "running" && (
+          <div className="flex items-center gap-2">
+            <div>
+              <span className="text-gray-500">Running with args:</span>{" "}
+              <span className="font-medium">{runningState.args}</span>
+            </div>
+            <Button onClick={() => setRunningState({ mode: "idle" })}>
+              Stop
+            </Button>
+          </div>
+        )}
+      </TopPanel>
+      {runningState.mode === "running" && (
+        <div className="flex h-full min-h-0 p-4">
+          <MettaPlayerSession args={runningState.args} />
         </div>
-        <div className="overflow-y-auto">
-          <MessagesViewer messages={state.messages} />
-        </div>
-      </div>
+      )}
     </div>
   );
 };

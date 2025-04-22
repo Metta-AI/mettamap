@@ -34,7 +34,6 @@ export class MettagridSocket {
 
   constructor(params: {
     args: string;
-    env: string;
     onError: (error: string) => void;
     onMessage: (message: MettagridMessage) => void;
   }) {
@@ -44,7 +43,6 @@ export class MettagridSocket {
     const endpoint = `ws://localhost:8000/ws`;
     const queryParams = new URLSearchParams({
       args: params.args,
-      env: params.env,
     });
     const socket = new WebSocket(`${endpoint}?${queryParams.toString()}`);
     socket.onmessage = function (event) {

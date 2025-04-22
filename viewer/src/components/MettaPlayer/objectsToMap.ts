@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 // From constants.hpp
 const objectTypes: Record<number, [string, string]> = {
   0: ["agent", "A"],
@@ -15,17 +13,17 @@ const objectTypes: Record<number, [string, string]> = {
   10: ["converter", "v"],
 } as const;
 
-const objectsSchema = z.record(
-  z.string(),
-  z.object({
-    r: z.number(),
-    c: z.number(),
-    wall: z.number().optional(),
-    agent: z.number().optional(),
-    generator: z.number().optional(),
-    // TODO - more types
-  })
-);
+// const objectsSchema = z.record(
+//   z.string(),
+//   z.object({
+//     r: z.number(),
+//     c: z.number(),
+//     wall: z.number().optional(),
+//     agent: z.number().optional(),
+//     generator: z.number().optional(),
+//     // TODO - more types
+//   })
+// );
 
 export function objectsToMap(objects: unknown) {
   // fast parsing; zod is too slow
