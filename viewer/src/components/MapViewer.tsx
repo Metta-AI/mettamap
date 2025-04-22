@@ -1,5 +1,12 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import usePanZoom from "use-pan-and-zoom";
 
 const asciiToObjectType = {
   "#": "wall",
@@ -105,6 +112,12 @@ export const MapViewer = ({ data }: { data: string }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const { transform, setContainer, panZoomHandlers, setZoom, setPan } =
+    usePanZoom({
+      minZoom: 1,
+      maxZoom: 10,
+      zoomSensitivity: 0.007,
+    });
   const [sprites, setSprites] = useState<Sprites | null>(null);
 
   const draw = useCallback(() => {
@@ -224,9 +237,26 @@ export const MapViewer = ({ data }: { data: string }) => {
      */
 
   return (
-    <div ref={containerRef} className="h-full w-full">
+    <div
+      ref={(el) => {
+        containerRef.current = el;
+        setContainer(el);
+      }}
+      {...panZoomHandlers}
+      onDoubleClick={() => {
+        // Due to the bug in use-pan-and-zoom, we can't do an even number of
+        // updates - its useForceUpdate implementation uses a boolean for state,
+        // that flips twice and so doesn't re-render.
+        // (PS: o4-mini-high is very smart, figured it out in 3 minutes)
+        setZoom(1);
+        setPan({ x: 0, y: 0 });
+        setPan({ x: 0, y: 0 });
+      }}
+      className="h-full w-full cursor-grab bg-gray-100"
+    >
       <canvas
         ref={canvasRef}
+        style={{ transform }}
         className="mx-auto max-h-full max-w-full border border-gray-300"
       />
     </div>

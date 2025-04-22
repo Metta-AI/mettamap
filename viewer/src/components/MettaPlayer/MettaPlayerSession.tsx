@@ -87,7 +87,7 @@ export const MettaPlayerSession: FC<{ args: string }> = ({ args }) => {
         },
       });
     });
-  }, [dispatch]);
+  }, [dispatch, args]);
 
   useEffect(() => {
     if (socket) {
@@ -107,7 +107,7 @@ export const MettaPlayerSession: FC<{ args: string }> = ({ args }) => {
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="grid min-h-0 flex-1 grid-cols-2 gap-4">
-        <div className="min-h-0">
+        <div className="min-h-0 overflow-auto">
           {state.map && <MapViewer data={state.map} />}
         </div>
         <div className="flex flex-col gap-4">

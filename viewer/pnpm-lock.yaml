@@ -29,6 +29,9 @@ importers:
       react-select:
         specifier: ^5.10.1
         version: 5.10.1(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      use-pan-and-zoom:
+        specifier: ^0.6.5
+        version: 0.6.5(react@19.1.0)
       zod:
         specifier: ^3.24.3
         version: 3.24.3
@@ -2137,6 +2140,11 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  use-pan-and-zoom@0.6.5:
+    resolution: {integrity: sha512-f/w1/AjfhfUUZiQ0+kHAPqwJLDW8mEX1UMiN6aK2LDl9hIpIr4d57h8+WjXFUAtYXJ+I3+CQSoujH3/gChNP7w==}
+    peerDependencies:
+      react: ^17.0.2
 
   which-boxed-primitive@1.1.1:
     resolution: {integrity: sha512-TbX3mj8n0odCBFVlY8AxkqcHASw3L60jIuF8jFP78az3C2YhmGvqbHBpAjTRH2/xqYunrJ9g1jSyjCjpoWzIAA==}
@@ -4371,6 +4379,10 @@ snapshots:
       react: 19.1.0
     optionalDependencies:
       '@types/react': 19.1.0
+
+  use-pan-and-zoom@0.6.5(react@19.1.0):
+    dependencies:
+      react: 19.1.0
 
   which-boxed-primitive@1.1.1:
     dependencies:
