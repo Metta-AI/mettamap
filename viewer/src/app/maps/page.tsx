@@ -1,10 +1,10 @@
-import { type SearchParams } from 'nuqs/server';
+import { type SearchParams } from "nuqs/server";
 
-import { ExtendedMapViewer } from '@/components/ExtendedMapViewer';
-import { getMaps } from '@/server/getMaps';
+import { ExtendedMapViewer } from "@/components/ExtendedMapViewer";
+import { getMaps } from "@/server/getMaps";
 
-import { paramsLoader } from '../params';
-import { LoadMoreButton } from './LoadMoreButton';
+import { paramsLoader } from "../params";
+import { LoadMoreButton } from "./LoadMoreButton";
 
 export default async function MapsPage({
   searchParams,
@@ -25,7 +25,7 @@ export default async function MapsPage({
         {maps.slice(0, limit).map((map) => (
           <div
             key={map.file}
-            className="border-2 border-gray-300 rounded-md p-4"
+            className="rounded-md border-2 border-gray-300 p-4"
           >
             <ExtendedMapViewer map={map} />
           </div>

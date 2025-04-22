@@ -7,15 +7,15 @@ import {
   useEffect,
   useReducer,
   useState,
-} from 'react';
+} from "react";
 
-import { Button } from '../Button';
-import { MapViewer } from '../MapViewer';
-import { objectsToMap } from './objectsToMap';
+import { Button } from "../Button";
+import { MapViewer } from "../MapViewer";
+import { objectsToMap } from "./objectsToMap";
 import {
   MettagridMessage,
   MettagridSocket,
-} from './socket';
+} from "./socket";
 
 type PlayerState = {
   messages: MettagridMessage[];
@@ -28,6 +28,8 @@ type PlayerAction = {
   message: MettagridMessage;
 };
 
+const MAX_MESSAGES = 20; // would run out of memory in long sessions otherwise
+
 const playerReducer: Reducer<PlayerState, PlayerAction> = (
   state: PlayerState,
   action: PlayerAction
@@ -38,13 +40,13 @@ const playerReducer: Reducer<PlayerState, PlayerAction> = (
         case "initial_state":
           return {
             ...state,
-            messages: [...state.messages, action.message].slice(-20),
+            messages: [...state.messages, action.message].slice(-MAX_MESSAGES),
             map: objectsToMap(action.message.objects),
           };
         case "step_results":
           return {
             ...state,
-            messages: [...state.messages, action.message].slice(-20),
+            messages: [...state.messages, action.message].slice(-MAX_MESSAGES),
             map: objectsToMap(action.message.objects),
             step: state.step + 1,
           };
@@ -63,7 +65,7 @@ const MessagesViewer: FC<{ messages: MettagridMessage[] }> = ({ messages }) => {
   return (
     <div>
       {messages.map((message, i) => (
-        <p key={i} className="text-xs font-mono">
+        <p key={i} className="font-mono text-xs">
           {message.type}
         </p>
       ))}
@@ -117,7 +119,7 @@ export const MettaPlayer: FC = () => {
   // }, [socket, state.step]);
 
   return (
-    <div className="h-full min-h-0 flex flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       <div className="flex flex-row gap-4">
         {socket?.socket.readyState === WebSocket.OPEN ? (
           <>
@@ -134,7 +136,7 @@ export const MettaPlayer: FC = () => {
           <div>Connecting...</div>
         )}
       </div>
-      <div className="grid grid-cols-2 gap-4 flex-1 min-h-0">
+      <div className="grid min-h-0 flex-1 grid-cols-2 gap-4">
         <div className="min-h-0">
           {state.map && <MapViewer data={state.map} />}
         </div>

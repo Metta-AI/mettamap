@@ -1,5 +1,5 @@
-import { ExtendedMapViewer } from '@/components/ExtendedMapViewer';
-import { getMap } from '@/server/getMaps';
+import { ExtendedMapViewer } from "@/components/ExtendedMapViewer";
+import { getMap } from "@/server/getMaps";
 
 export default async function MapPage({
   params,

@@ -1,10 +1,5 @@
 "use client";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const asciiToObjectType = {
   "#": "wall",
@@ -229,10 +224,10 @@ export const MapViewer = ({ data }: { data: string }) => {
      */
 
   return (
-    <div ref={containerRef} className="w-full h-full">
+    <div ref={containerRef} className="h-full w-full">
       <canvas
         ref={canvasRef}
-        className="border border-gray-300 max-w-full max-h-full mx-auto"
+        className="mx-auto max-h-full max-w-full border border-gray-300"
       />
     </div>
   );

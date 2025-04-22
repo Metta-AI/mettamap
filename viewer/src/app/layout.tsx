@@ -1,14 +1,10 @@
-import './globals.css';
+import "./globals.css";
 
-import {
-  FC,
-  PropsWithChildren,
-  Suspense,
-} from 'react';
+import { FC, PropsWithChildren, Suspense } from "react";
 
-import type { Metadata } from 'next';
-import Link from 'next/link';
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
+import type { Metadata } from "next";
+import Link from "next/link";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export const metadata: Metadata = {
   title: "MettaMap viewer",
@@ -24,7 +20,7 @@ const GlobalProviders: FC<PropsWithChildren> = ({ children }) => {
 
 const TopMenu: FC = () => {
   return (
-    <div className="px-8 py-2 border-b border-gray-200 bg-gray-100 flex items-center gap-4">
+    <div className="flex items-center gap-4 border-b border-gray-200 bg-gray-100 px-8 py-2">
       <Link href="/" className="font-bold">
         MettaMap Viewer
       </Link>
@@ -48,7 +44,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
     <html lang="en">
       <body>
         <GlobalProviders>
-          <div className="flex flex-col h-screen">
+          <div className="flex h-screen flex-col">
             <TopMenu />
             {children}
           </div>

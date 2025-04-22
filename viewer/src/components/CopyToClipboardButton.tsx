@@ -1,11 +1,7 @@
 "use client";
-import {
-  FC,
-  PropsWithChildren,
-  useState,
-} from 'react';
+import { FC, PropsWithChildren, useState } from "react";
 
-import { Button } from './Button';
+import { Button } from "./Button";
 
 export const CopyToClipboardButton: FC<PropsWithChildren<{ text: string }>> = ({
   text,

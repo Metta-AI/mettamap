@@ -1,9 +1,9 @@
-import fs from 'fs/promises';
-import yaml from 'js-yaml';
+import fs from "fs/promises";
+import yaml from "js-yaml";
 
-import { MAP_INDEX_FILE } from '@/server/constants';
-import { getMaps } from '@/server/getMaps';
-import { MapFile } from '@/server/types';
+import { MAP_INDEX_FILE } from "@/server/constants";
+import { getMaps } from "@/server/getMaps";
+import { MapFile } from "@/server/types";
 
 export function frontmatterToKeyValues(
   frontmatter: unknown

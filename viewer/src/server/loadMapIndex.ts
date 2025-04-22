@@ -1,7 +1,7 @@
-import fs from 'fs/promises';
-import path from 'path';
+import fs from "fs/promises";
+import path from "path";
 
-import { MAP_INDEX_FILE } from './constants';
+import { MAP_INDEX_FILE } from "./constants";
 
 export type MapIndex = Record<string, Record<string, string[]>>;
 

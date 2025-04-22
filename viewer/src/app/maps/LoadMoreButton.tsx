@@ -1,9 +1,9 @@
 "use client";
-import { useQueryState } from 'nuqs';
+import { useQueryState } from "nuqs";
 
-import { Button } from '@/components/Button';
+import { Button } from "@/components/Button";
 
-import { parseLimitParam } from '../params';
+import { parseLimitParam } from "../params";
 
 export const LoadMoreButton = () => {
   const [limit, setLimit] = useQueryState(

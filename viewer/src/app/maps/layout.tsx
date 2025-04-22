@@ -1,6 +1,6 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren } from "react";
 
-import { MapFilter } from './MapFilter';
+import { MapFilter } from "./MapFilter";
 
 export default function MapsLayout({ children }: PropsWithChildren) {
   return (

@@ -1,24 +1,18 @@
 "use client";
-import {
-  FC,
-  useState,
-} from 'react';
+import { FC, useState } from "react";
 
-import { useQueryState } from 'nuqs';
-import Select from 'react-select';
+import { useQueryState } from "nuqs";
+import Select from "react-select";
 
-import { MapIndex } from '@/server/loadMapIndex';
+import { MapIndex } from "@/server/loadMapIndex";
 
-import {
-  FilterItem,
-  parseFilterParam,
-} from '../params';
+import { FilterItem, parseFilterParam } from "../params";
 
 const FilterPair: FC<{
   filter: FilterItem;
 }> = ({ filter }) => {
   return (
-    <div className="text-xs font-mono">
+    <div className="font-mono text-xs">
       <span className="font-bold">{filter.key}</span> = {filter.value}
     </div>
   );
@@ -29,7 +23,7 @@ const DeleteButton: FC<{
 }> = ({ onClick }) => {
   return (
     <button
-      className="text-gray-700 px-2 py-1 rounded-md text-sm cursor-pointer hover:bg-red-50 hover:text-red-500"
+      className="cursor-pointer rounded-md px-2 py-1 text-sm text-gray-700 hover:bg-red-50 hover:text-red-500"
       onClick={onClick}
     >
       x
@@ -56,7 +50,7 @@ const NewFilter: FC<{
 
   if (state.kind === "empty") {
     return (
-      <div className="flex gap-2 items-center">
+      <div className="flex items-center gap-2">
         <div className="flex-1">
           <Select
             autoFocus
@@ -81,8 +75,8 @@ const NewFilter: FC<{
   }
 
   return (
-    <div className="flex gap-2 items-center">
-      <div className="text-xs font-mono">{state.key}</div>
+    <div className="flex items-center gap-2">
+      <div className="font-mono text-xs">{state.key}</div>
       <div className="flex-1">
         <Select
           autoFocus
@@ -121,7 +115,7 @@ export const InnerMapFilter: FC<{ mapIndex: MapIndex }> = ({ mapIndex }) => {
     <div>
       {filters?.map((filter, i) => {
         return (
-          <div key={i} className="flex gap-2 items-center">
+          <div key={i} className="flex items-center gap-2">
             <div className="flex-1">
               <FilterPair filter={filter} />
             </div>
@@ -147,7 +141,7 @@ export const InnerMapFilter: FC<{ mapIndex: MapIndex }> = ({ mapIndex }) => {
         />
       ) : (
         <button
-          className="bg-blue-500 text-white px-2 py-1 rounded-md text-xs cursor-pointer"
+          className="cursor-pointer rounded-md bg-blue-500 px-2 py-1 text-xs text-white"
           onClick={() => {
             setNewFilter(true);
           }}

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // From constants.hpp
 const objectTypes: Record<number, [string, string]> = {

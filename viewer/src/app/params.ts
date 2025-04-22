@@ -3,7 +3,7 @@ import {
   createParser,
   parseAsArrayOf,
   parseAsInteger,
-} from 'nuqs/server';
+} from "nuqs/server";
 
 export type FilterItem = {
   key: string;

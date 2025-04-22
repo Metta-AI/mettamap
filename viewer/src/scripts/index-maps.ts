@@ -1,4 +1,4 @@
-import { makeMapIndex } from '@/server/makeMapIndex';
+import { makeMapIndex } from "@/server/makeMapIndex";
 
 function main() {
   makeMapIndex().then(() => {

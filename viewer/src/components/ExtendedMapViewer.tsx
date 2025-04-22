@@ -1,21 +1,15 @@
 "use client";
-import {
-  FC,
-  useMemo,
-} from 'react';
+import { FC, useMemo } from "react";
 
-import clsx from 'clsx';
-import yaml from 'js-yaml';
-import { useQueryState } from 'nuqs';
+import clsx from "clsx";
+import yaml from "js-yaml";
+import { useQueryState } from "nuqs";
 
-import {
-  FilterItem,
-  parseFilterParam,
-} from '@/app/params';
-import { MapFile } from '@/server/types';
+import { FilterItem, parseFilterParam } from "@/app/params";
+import { MapFile } from "@/server/types";
 
-import { CopyToClipboardButton } from './CopyToClipboardButton';
-import { MapViewer } from './MapViewer';
+import { CopyToClipboardButton } from "./CopyToClipboardButton";
+import { MapViewer } from "./MapViewer";
 
 const FrontmatterViewer: FC<{ frontmatter: Record<string, unknown> }> = ({
   frontmatter,
@@ -82,7 +76,7 @@ const FrontmatterViewer: FC<{ frontmatter: Record<string, unknown> }> = ({
       <div
         key={fullKey}
         className={clsx(
-          "cursor-pointer hover:bg-blue-100 px-1 py-0.5 rounded font-mono",
+          "cursor-pointer rounded px-1 py-0.5 font-mono hover:bg-blue-100",
           isActive && "bg-blue-200"
         )}
         onClick={() => handleFrontmatterClick(fullKey, String(value))}
@@ -98,7 +92,7 @@ const FrontmatterViewer: FC<{ frontmatter: Record<string, unknown> }> = ({
   };
 
   return (
-    <div className="text-xs border border-gray-200 rounded p-4 bg-gray-50">
+    <div className="rounded border border-gray-200 bg-gray-50 p-4 text-xs">
       {Object.entries(frontmatter).map(([key, value]) =>
         renderFrontmatterLine(key, value)
       )}

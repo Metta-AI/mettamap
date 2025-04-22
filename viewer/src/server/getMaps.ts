@@ -1,9 +1,9 @@
-import fs from 'fs/promises';
-import yaml from 'js-yaml';
+import fs from "fs/promises";
+import yaml from "js-yaml";
 
-import { MAP_DIR } from './constants';
-import { loadMapIndex } from './loadMapIndex';
-import { MapFile } from './types';
+import { MAP_DIR } from "./constants";
+import { loadMapIndex } from "./loadMapIndex";
+import { MapFile } from "./types";
 
 function parseMapFile(map: string): MapFile["content"] {
   const [frontmatter, ...rest] = map.split("---");
