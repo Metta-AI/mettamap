@@ -20,6 +20,28 @@ type Props = {
   grid: MettaGrid;
 };
 
+const Overlay: FC<{
+  cellSize: number;
+  selectedCell: {
+    x: number;
+    y: number;
+  } | null;
+}> = ({ cellSize, selectedCell }) => {
+  if (!selectedCell) return null;
+  return (
+    <div
+      className="pointer-events-none absolute border border-red-500"
+      style={{
+        left: selectedCell?.x * cellSize,
+        top: selectedCell?.y * cellSize,
+        width: cellSize + 2,
+        height: cellSize + 2,
+        // backgroundColor: "rgba(255, 255, 255, 0.2)",
+      }}
+    ></div>
+  );
+};
+
 export const MapViewer: FC<Props> = ({ grid }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,7 +54,14 @@ export const MapViewer: FC<Props> = ({ grid }) => {
     });
   const [sprites, setSprites] = useState<Sprites | null>(null);
 
+  // Cell size used for drawing the grid.
+  // This is in internal canvas pixels, not pixels on the screen. (canvas.width, not clientWidth)
   const [cellSize, setCellSize] = useState(0);
+
+  const [selectedCell, setSelectedCell] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   const measureCellSize = useCallback(() => {
     if (!canvasRef.current || !containerRef.current) return;
@@ -44,7 +73,8 @@ export const MapViewer: FC<Props> = ({ grid }) => {
     const widthBasedSize = Math.floor(containerWidth / grid.width);
     const heightBasedSize = Math.floor(containerHeight / grid.height);
 
-    // large minimal cell size is useful for zoom, but not very effective, could be optimized
+    // Large minimal cell size is useful for zoom, but not very effective, could be optimized.
+    // This results in 3k * 3k canvas for 120x120 grid.
     // (e.g. with Factorio-style discrete zoom and pre-rendered sprites for each size)
     const cellSize = Math.max(24, Math.min(widthBasedSize, heightBasedSize));
     setCellSize(cellSize);
@@ -60,8 +90,6 @@ export const MapViewer: FC<Props> = ({ grid }) => {
 
   const draw = useCallback(() => {
     if (!sprites || !canvasRef.current || !cellSize) return;
-
-    console.log("cellSize", cellSize);
 
     drawGrid({
       grid,
@@ -88,22 +116,30 @@ export const MapViewer: FC<Props> = ({ grid }) => {
   // Benchmark: uncomment to redraw 60 frames per second when the canvas is visible on screen
   // useStressTest(draw, canvasRef.current);
 
-  const onClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+  const onMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
       if (!canvasRef.current) return;
 
       // 1. Grab the bounding box AFTER CSS transforms:
       const rect = canvasRef.current.getBoundingClientRect();
+
       // 2. Compute screen‑relative coords inside that box
       const sx = e.clientX - rect.left;
       const sy = e.clientY - rect.top;
-      // 3. Un‑scale to get your logical canvas coords:
-      const canvasX = sx / zoom;
-      const canvasY = sy / zoom;
 
-      console.log("Canvas coordinates:", canvasX, canvasY);
+      // // 3. Un‑scale to get your logical canvas coords:
+      // const canvasX = sx / zoom;
+      // const canvasY = sy / zoom;
+
+      const x = sx * (grid.width / rect.width);
+      const y = sy * (grid.height / rect.height);
+
+      setSelectedCell({
+        x: Math.floor(x),
+        y: Math.floor(y),
+      });
     },
-    [zoom]
+    [zoom, cellSize, grid]
   );
 
   return (
@@ -118,14 +154,26 @@ export const MapViewer: FC<Props> = ({ grid }) => {
         setZoom(1);
         setPan({ x: 0, y: 0 });
       }}
-      onClick={onClick}
-      className="h-full w-full cursor-grab bg-gray-100"
+      className="relative h-full w-full cursor-grab bg-gray-100"
     >
       <canvas
         ref={canvasRef}
+        onMouseMove={onMouseMove}
+        onMouseLeave={() => setSelectedCell(null)}
         style={{ transform }}
         className="mx-auto max-h-full max-w-full border border-gray-300"
       />
+      <div
+        style={{ transform }}
+        className="pointer-events-none absolute inset-0 z-10"
+      >
+        {canvasRef.current && selectedCell && (
+          <Overlay
+            cellSize={canvasRef.current?.clientWidth / grid.width}
+            selectedCell={selectedCell}
+          />
+        )}
+      </div>
     </div>
   );
 };

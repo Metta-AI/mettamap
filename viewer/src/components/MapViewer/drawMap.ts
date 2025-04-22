@@ -7,11 +7,13 @@ export async function drawGrid({
   canvas,
   sprites,
   cellSize,
+  // selectedCell,
 }: {
   grid: MettaGrid;
   canvas: HTMLCanvasElement;
   sprites: Sprites;
   cellSize: number;
+  // selectedCell: { x: number; y: number } | null;
 }) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
@@ -49,4 +51,14 @@ export async function drawGrid({
       sprites.draw(objectType, ctx, x * cellSize, y * cellSize, cellSize);
     }
   }
+
+  // if (selectedCell) {
+  //   ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+  //   ctx.fillRect(
+  //     selectedCell.x * cellSize,
+  //     selectedCell.y * cellSize,
+  //     cellSize,
+  //     cellSize
+  //   );
+  // }
 }
