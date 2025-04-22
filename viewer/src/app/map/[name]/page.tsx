@@ -1,4 +1,4 @@
-import { ExtendedMapViewer } from "@/components/ExtendedMapViewer";
+import { ExtendedMapViewer } from "@/components/MapFileViewer";
 import { getMap } from "@/server/getMaps";
 
 export default async function MapPage({

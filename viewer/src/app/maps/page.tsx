@@ -1,6 +1,6 @@
 import { type SearchParams } from "nuqs/server";
 
-import { ExtendedMapViewer } from "@/components/ExtendedMapViewer";
+import { ExtendedMapViewer } from "@/components/MapFileViewer";
 import { getMaps } from "@/server/getMaps";
 
 import { paramsLoader } from "../params";

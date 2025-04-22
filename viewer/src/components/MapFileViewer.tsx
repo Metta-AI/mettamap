@@ -1,11 +1,17 @@
 "use client";
-import { FC, useMemo } from "react";
+import {
+  FC,
+  useMemo,
+} from "react";
 
 import clsx from "clsx";
 import yaml from "js-yaml";
 import { useQueryState } from "nuqs";
 
-import { FilterItem, parseFilterParam } from "@/app/params";
+import {
+  FilterItem,
+  parseFilterParam,
+} from "@/app/params";
 import { MapFile } from "@/server/types";
 
 import { CopyToClipboardButton } from "./CopyToClipboardButton";
