@@ -16,7 +16,8 @@ import {
   Sprites,
 } from "./sprites";
 
-type CellHandler = (cell: { x: number; y: number } | undefined) => void;
+export type Cell = { x: number; y: number };
+type CellHandler = (cell: Cell | undefined) => void;
 
 type Props = {
   grid: MettaGrid;

@@ -81,4 +81,10 @@ export class MettagridSocket {
       this.socket.close();
     }
   }
+
+  get status() {
+    // https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState#value
+    const stateToStatus = ["CONNECTING", "OPEN", "CLOSING", "CLOSED"] as const;
+    return stateToStatus[this.socket.readyState];
+  }
 }
