@@ -43,9 +43,8 @@ export async function drawGrid({
 
   // Draw the map
   for (const object of grid.objects) {
-    const objectType = object.name;
     sprites.draw(
-      objectType,
+      object,
       ctx,
       object.c * cellSize,
       object.r * cellSize,

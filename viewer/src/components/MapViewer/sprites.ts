@@ -1,9 +1,9 @@
 import {
   ItemObjectName,
-  ObjectName,
+  MettaObject,
 } from "@/lib/MettaGrid";
 
-const objectTypeToItemTile = {
+const objectNameToItemTile = {
   converter: [0, 0],
   mine: [14, 2],
   generator: [2, 2],
@@ -31,23 +31,41 @@ export class Sprites {
   }
 
   draw(
-    name: ObjectName,
+    object: MettaObject,
     ctx: CanvasRenderingContext2D,
     x: number,
     y: number,
     size: number
   ) {
-    switch (name) {
+    switch (object.name) {
       case "empty":
         return;
       case "wall":
         ctx.drawImage(this.wall, x, y, size, size);
         break;
-      case "agent":
-        ctx.drawImage(this.monsters, 0, 0, 16, 16, x, y, size, size);
+      case "agent": {
+        // from raylib_renderer code:
+        // orientation: 0 = Up, 1 = Down, 2 = Left, 3 = Right
+        // sprites: 0 = Right, 1 = Up, 2 = Down, 3 = Left
+        const tileX = [1, 2, 3, 0][
+          (object.other as any)["agent:orientation"] ?? 0
+        ];
+        const tileY = 0; // TODO: agent.group
+        ctx.drawImage(
+          this.monsters,
+          tileX * 16,
+          tileY * 16,
+          16,
+          16,
+          x,
+          y,
+          size,
+          size
+        );
         break;
-      default:
-        const [tileX, tileY] = objectTypeToItemTile[name];
+      }
+      default: {
+        const [tileX, tileY] = objectNameToItemTile[object.name];
         ctx.drawImage(
           this.items,
           tileX * 16,
@@ -60,6 +78,7 @@ export class Sprites {
           size
         );
         break;
+      }
     }
   }
 }

@@ -19,12 +19,19 @@ export const ObjectDetails: FC<{ object: MettaObject }> = ({ object }) => {
         ({object.r}, {object.c})
       </span>
 
-      {Object.entries(object.other).map(([k, v]) => (
-        <Fragment key={k}>
-          <span className="font-bold text-gray-500">{k}:</span>
-          <span>{String(v)}</span>
-        </Fragment>
-      ))}
+      {Object.entries(object.other).map(([k, v]) => {
+        let value = String(v);
+        if (k === "agent:orientation") {
+          // orientation: 0 = Up, 1 = Down, 2 = Left, 3 = Right
+          value = value + " (" + ["N", "S", "W", "E"][Number(v)] + ")";
+        }
+        return (
+          <Fragment key={k}>
+            <span className="font-bold text-gray-500">{k}:</span>
+            <span>{value}</span>
+          </Fragment>
+        );
+      })}
     </div>
   );
 };
