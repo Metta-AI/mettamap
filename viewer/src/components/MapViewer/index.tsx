@@ -7,42 +7,69 @@ import {
   useState,
 } from "react";
 
+import { usePanZoom } from "@/hooks/use-pan-and-zoom";
 import { MettaGrid } from "@/lib/MettaGrid";
 
-import { usePanZoom } from "../../hooks/use-pan-and-zoom";
 import { drawGrid } from "./drawMap";
 import {
   loadSprites,
   Sprites,
 } from "./sprites";
 
+type CellHandler = (cell: { x: number; y: number } | undefined) => void;
+
 type Props = {
   grid: MettaGrid;
-  onCellHover?: (cell: { x: number; y: number } | null) => void;
+  onCellHover?: CellHandler;
+  selectedCell?: { x: number; y: number };
+  onCellSelect?: CellHandler;
 };
 
 const Overlay: FC<{
   cellSize: number;
-  selectedCell: {
+  hoveredCell?: {
     x: number;
     y: number;
-  } | null;
-}> = ({ cellSize, selectedCell }) => {
-  if (!selectedCell) return null;
+  };
+  selectedCell?: {
+    x: number;
+    y: number;
+  };
+}> = ({ cellSize, hoveredCell, selectedCell }) => {
   return (
-    <div
-      className="pointer-events-none absolute border border-red-500"
-      style={{
-        left: selectedCell?.x * cellSize,
-        top: selectedCell?.y * cellSize,
-        width: cellSize + 2,
-        height: cellSize + 2,
-      }}
-    ></div>
+    <>
+      {hoveredCell && (
+        <div
+          className="absolute border border-blue-500"
+          style={{
+            left: hoveredCell?.x * cellSize,
+            top: hoveredCell?.y * cellSize,
+            width: cellSize + 2,
+            height: cellSize + 2,
+          }}
+        ></div>
+      )}
+      {selectedCell && (
+        <div
+          className="absolute border border-red-500"
+          style={{
+            left: selectedCell?.x * cellSize,
+            top: selectedCell?.y * cellSize,
+            width: cellSize + 2,
+            height: cellSize + 2,
+          }}
+        ></div>
+      )}
+    </>
   );
 };
 
-export const MapViewer: FC<Props> = ({ grid, onCellHover }) => {
+export const MapViewer: FC<Props> = ({
+  grid,
+  onCellHover,
+  onCellSelect,
+  selectedCell,
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -58,10 +85,13 @@ export const MapViewer: FC<Props> = ({ grid, onCellHover }) => {
   // This is in internal canvas pixels, not pixels on the screen. (canvas.width, not clientWidth)
   const [cellSize, setCellSize] = useState(0);
 
-  const [selectedCell, setSelectedCell] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
+  const [hoveredCell, setHoveredCell] = useState<
+    | {
+        x: number;
+        y: number;
+      }
+    | undefined
+  >();
 
   const measureCellSize = useCallback(() => {
     if (!canvasRef.current || !containerRef.current) return;
@@ -116,9 +146,9 @@ export const MapViewer: FC<Props> = ({ grid, onCellHover }) => {
   // Benchmark: uncomment to redraw 60 frames per second when the canvas is visible on screen
   // useStressTest(draw, canvasRef.current);
 
-  const onMouseMove = useCallback(
+  const cellFromMouseEvent = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!canvasRef.current) return;
+      if (!canvasRef.current) return null;
 
       // 1. Grab the bounding box AFTER CSS transforms:
       const rect = canvasRef.current.getBoundingClientRect();
@@ -134,13 +164,36 @@ export const MapViewer: FC<Props> = ({ grid, onCellHover }) => {
       const x = sx * (grid.width / rect.width);
       const y = sy * (grid.height / rect.height);
 
-      setSelectedCell({
-        x: Math.floor(x),
-        y: Math.floor(y),
-      });
-      onCellHover?.({ x: Math.floor(x), y: Math.floor(y) });
+      return { x: Math.floor(x), y: Math.floor(y) };
     },
-    [zoom, cellSize, grid]
+    [grid]
+  );
+
+  const onMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      const cell = cellFromMouseEvent(e);
+      if (!cell) return;
+
+      setHoveredCell(cell);
+      onCellHover?.(cell);
+    },
+    [zoom, grid, onCellHover, cellFromMouseEvent]
+  );
+
+  const onMouseClick = useCallback(
+    (e: React.MouseEvent<HTMLCanvasElement>) => {
+      if (!onCellSelect) return;
+
+      const cell = cellFromMouseEvent(e);
+      if (!cell) return;
+
+      if (grid.object(cell.x, cell.y)) {
+        onCellSelect(cell);
+      } else {
+        onCellSelect(undefined);
+      }
+    },
+    [zoom, grid, onCellSelect, cellFromMouseEvent]
   );
 
   return (
@@ -165,15 +218,17 @@ export const MapViewer: FC<Props> = ({ grid, onCellHover }) => {
           ref={canvasRef}
           onMouseMove={onMouseMove}
           onMouseLeave={() => {
-            setSelectedCell(null);
-            onCellHover?.(null);
+            setHoveredCell(undefined);
+            onCellHover?.(undefined);
           }}
+          onClick={onMouseClick}
           className="max-h-full max-w-full border border-gray-300"
         />
         <div className="pointer-events-none absolute inset-0 z-10">
-          {canvasRef.current && selectedCell && (
+          {canvasRef.current && (
             <Overlay
               cellSize={canvasRef.current?.clientWidth / grid.width}
+              hoveredCell={hoveredCell}
               selectedCell={selectedCell}
             />
           )}

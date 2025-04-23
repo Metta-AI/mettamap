@@ -7,8 +7,8 @@ import {
 
 import { Button } from "../Button";
 import { MapViewer } from "../MapViewer";
+import { ObjectDetailsFromCell } from "../ObjectDetailsFromCell";
 import { MessagesViewer } from "./MessagesViewer";
-import { ObjectDetails } from "./ObjectDetails";
 import { usePlayerReducer } from "./reducer";
 import { MettagridSocket } from "./socket";
 
@@ -55,21 +55,37 @@ export const MettaPlayerSession: FC<{ args: string }> = ({ args }) => {
   //   }
   // }, [socket, state.step]);
 
-  const [hoveredCell, setHoveredCell] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
+  const [hoveredCell, setHoveredCell] = useState<
+    | {
+        x: number;
+        y: number;
+      }
+    | undefined
+  >();
 
   const hoveredObject = hoveredCell
     ? state.map?.object(hoveredCell.x, hoveredCell.y)
-    : null;
+    : undefined;
+
+  const [selectedCell, setSelectedCell] = useState<
+    | {
+        x: number;
+        y: number;
+      }
+    | undefined
+  >();
 
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="grid min-h-0 flex-1 grid-cols-2 gap-4">
         <div className="min-h-0 overflow-auto">
           {state.map && (
-            <MapViewer grid={state.map} onCellHover={setHoveredCell} />
+            <MapViewer
+              grid={state.map}
+              onCellHover={setHoveredCell}
+              selectedCell={selectedCell}
+              onCellSelect={setSelectedCell}
+            />
           )}
         </div>
         <div className="flex min-h-0 flex-col gap-4">
@@ -92,8 +108,21 @@ export const MettaPlayerSession: FC<{ args: string }> = ({ args }) => {
               <div>Connecting...</div>
             )}
           </div>
-          <div className="flex-1 overflow-y-auto border-b border-gray-200">
-            {hoveredObject && <ObjectDetails object={hoveredObject} />}
+          <div className="grid flex-1 grid-cols-2 gap-4 overflow-y-auto border-b border-gray-200">
+            {state.map && (
+              <ObjectDetailsFromCell
+                cell={selectedCell}
+                grid={state.map}
+                title="Selected"
+              />
+            )}
+            {state.map && (
+              <ObjectDetailsFromCell
+                cell={hoveredCell}
+                grid={state.map}
+                title="Hovered"
+              />
+            )}
           </div>
           <div className="flex-1 shrink overflow-y-auto">
             <MessagesViewer messages={state.messages} />

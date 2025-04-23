@@ -43,20 +43,19 @@ export class MettaObject {
   readonly type: number;
   readonly r: number;
   readonly c: number;
-  readonly rawData: unknown;
+  readonly other: Record<string, unknown>;
   constructor(data: {
     id: number;
     type: number;
     r: number;
     c: number;
-    rawData: unknown;
-    // can contain more fields
+    other?: Record<string, unknown>;
   }) {
     this.id = data.id;
     this.type = data.type;
     this.r = data.r;
     this.c = data.c;
-    this.rawData = data.rawData;
+    this.other = data.other ?? {};
   }
 
   get name(): ObjectName {
@@ -104,7 +103,7 @@ export class MettaGrid {
             type: objectType,
             r: y,
             c: x,
-            rawData: undefined, // can't derive from ascii
+            other: undefined, // can't derive from ascii
           })
         );
       });
@@ -127,13 +126,11 @@ export class MettaGrid {
       if (!entry || typeof entry !== "object") {
         throw new Error(`objects entry ${entry} is not an object`);
       }
-      const id = Number(entry["id"]);
-      const type = Number(entry["type"]);
-      const r = Number(entry["r"]);
-      const c = Number(entry["c"]);
+      // TODO - check types
+      const { id, type, r, c, ...other } = entry;
       width = Math.max(width, c);
       height = Math.max(height, r);
-      objectsList.push(new MettaObject({ id, type, r, c, rawData: entry }));
+      objectsList.push(new MettaObject({ id, type, r, c, other }));
     }
     width += 1;
     height += 1;

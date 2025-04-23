@@ -7,6 +7,8 @@ import {
 import { MapViewer } from "@/components/MapViewer";
 import { MettaGrid } from "@/lib/MettaGrid";
 
+import { ObjectDetailsFromCell } from "../../components/ObjectDetailsFromCell";
+
 export default function TryViewer() {
   const grid = useMemo(
     () =>
@@ -32,24 +34,37 @@ export default function TryViewer() {
     []
   );
 
-  const [hoveredCell, setHoveredCell] = useState<{
+  const [selectedCell, setSelectedCell] = useState<{
     x: number;
     y: number;
-  } | null>(null);
+  }>();
+
+  const [hoveredCell, setHoveredCell] = useState<
+    | {
+        x: number;
+        y: number;
+      }
+    | undefined
+  >();
 
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="mt-10 w-120 overflow-hidden border-10 border-blue-500">
-        <MapViewer grid={grid} onCellHover={setHoveredCell} />
+        <MapViewer
+          grid={grid}
+          onCellHover={setHoveredCell}
+          onCellSelect={setSelectedCell}
+          selectedCell={selectedCell}
+        />
       </div>
-      {hoveredCell && (
-        <div>
-          <div>
-            {hoveredCell.x}, {hoveredCell.y}
-          </div>
-          <div>{grid.object(hoveredCell.x, hoveredCell.y)}</div>
-        </div>
-      )}
+      <div className="mt-4 grid grid-cols-2 gap-16">
+        <ObjectDetailsFromCell cell={hoveredCell} grid={grid} title="Hovered" />
+        <ObjectDetailsFromCell
+          cell={selectedCell}
+          grid={grid}
+          title="Selected"
+        />
+      </div>
     </div>
   );
 }

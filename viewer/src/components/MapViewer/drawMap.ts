@@ -13,7 +13,6 @@ export async function drawGrid({
   canvas: HTMLCanvasElement;
   sprites: Sprites;
   cellSize: number;
-  // selectedCell: { x: number; y: number } | null;
 }) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
