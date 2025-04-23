@@ -10,6 +10,7 @@ import { MessageData } from "./reducer";
 
 const Message: FC<{ data: MessageData }> = ({ data }) => {
   const [expanded, setExpanded] = useState(false);
+
   return (
     <div
       className={clsx(
@@ -52,7 +53,7 @@ export const MessagesViewer: FC<{ messages: MessageData[] }> = ({
       <header className="mb-1 ml-1 text-sm font-bold text-gray-800">
         WebSocket message log
       </header>
-      {messages.toReversed().map((message, i) => (
+      {messages.toReversed().map((message) => (
         <Message key={message.id} data={message} />
       ))}
     </div>

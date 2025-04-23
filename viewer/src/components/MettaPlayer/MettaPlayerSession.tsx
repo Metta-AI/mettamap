@@ -17,6 +17,50 @@ import { MessagesViewer } from "./MessagesViewer";
 import { usePlayerReducer } from "./reducer";
 import { MettagridSocket } from "./socket";
 
+const RunControls: FC<{ runStep: () => void }> = ({ runStep }) => {
+  const [mode, setMode] = useState<"manual" | "10fps" | "30fps">("manual");
+
+  useEffect(() => {
+    if (mode === "10fps") {
+      const interval = setInterval(() => {
+        runStep();
+      }, 1000 / 10);
+      return () => clearInterval(interval);
+    } else if (mode === "30fps") {
+      const interval = setInterval(() => {
+        runStep();
+      }, 1000 / 30);
+      return () => clearInterval(interval);
+    }
+  }, [mode, runStep]);
+
+  return (
+    <div className="flex items-center gap-4">
+      <div className="flex items-center gap-1">
+        <Button
+          onClick={() => setMode("manual")}
+          theme={mode === "manual" ? "primary" : "secondary"}
+        >
+          Manual
+        </Button>
+        <Button
+          onClick={() => setMode("10fps")}
+          theme={mode === "10fps" ? "primary" : "secondary"}
+        >
+          10fps
+        </Button>
+        <Button
+          onClick={() => setMode("30fps")}
+          theme={mode === "30fps" ? "primary" : "secondary"}
+        >
+          30fps
+        </Button>
+      </div>
+      {mode === "manual" && <Button onClick={runStep}>Step</Button>}
+    </div>
+  );
+};
+
 export const MettaPlayerSession: FC<{ args: string }> = ({ args }) => {
   const [socket, setSocket] = useState<MettagridSocket | null>(null);
 
@@ -63,6 +107,10 @@ export const MettaPlayerSession: FC<{ args: string }> = ({ args }) => {
   const [hoveredCell, setHoveredCell] = useState<Cell | undefined>();
   const [selectedCell, setSelectedCell] = useState<Cell | undefined>();
 
+  const runStep = useCallback(() => {
+    socket?.sendCommand({ type: "step" });
+  }, [socket]);
+
   if (!socket) {
     return null;
   }
@@ -83,13 +131,7 @@ export const MettaPlayerSession: FC<{ args: string }> = ({ args }) => {
         <div className="flex items-center justify-between gap-4">
           {socket.status === "OPEN" ? (
             <div className="flex items-center gap-4">
-              <form
-                action={() => {
-                  socket?.sendCommand({ type: "step" });
-                }}
-              >
-                <Button type="submit">Step</Button>
-              </form>
+              <RunControls runStep={runStep} />
               <div>
                 <span className="text-gray-500">#</span>
                 <span className="font-medium">{state.step}</span>

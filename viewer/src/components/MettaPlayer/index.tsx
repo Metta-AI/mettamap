@@ -41,8 +41,12 @@ export const MettaPlayer: FC = () => {
             }}
           >
             <div className="flex items-center gap-2">
-              <TextInput name="args" placeholder="Hydra args" />
-              <Button type="submit">Start</Button>
+              <div className="flex-1">
+                <TextInput name="args" placeholder="Hydra args" />
+              </div>
+              <Button type="submit" theme="primary">
+                Start
+              </Button>
             </div>
           </form>
         )}

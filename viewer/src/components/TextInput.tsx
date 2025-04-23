@@ -8,7 +8,7 @@ export const TextInput: FC<{
     <input
       name={name}
       type="text"
-      className="rounded-md border-2 border-gray-300 bg-white px-2 py-1"
+      className="w-full rounded-md border-2 border-gray-300 bg-white px-2 py-1"
       placeholder={placeholder}
     />
   );

@@ -24,7 +24,7 @@ type PlayerAction = {
   message: MettagridMessage;
 };
 
-const MAX_MESSAGES = 50; // would run out of memory in long sessions otherwise
+const MAX_MESSAGES = 10; // would run out of memory in long sessions otherwise
 
 const playerReducer: Reducer<PlayerState, PlayerAction> = (
   state: PlayerState,
@@ -66,6 +66,8 @@ const playerReducer: Reducer<PlayerState, PlayerAction> = (
     }
   }
 };
+
+export type PlayerDispatch = ReturnType<typeof usePlayerReducer>[1];
 
 export function usePlayerReducer(initialState: PlayerState) {
   const [state, dispatch] = useReducer(playerReducer, initialState);
