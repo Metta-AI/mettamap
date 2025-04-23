@@ -1,6 +1,6 @@
 import {
-  ItemObjectType,
-  ObjectType,
+  ItemObjectName,
+  ObjectName,
 } from "@/lib/MettaGrid";
 
 const objectTypeToItemTile = {
@@ -13,7 +13,7 @@ const objectTypeToItemTile = {
   lab: [5, 1],
   factory: [13, 0],
   temple: [7, 2],
-} satisfies Record<ItemObjectType, [number, number]>;
+} satisfies Record<ItemObjectName, [number, number]>;
 
 export class Sprites {
   wall: HTMLImageElement;
@@ -31,13 +31,13 @@ export class Sprites {
   }
 
   draw(
-    item: ObjectType,
+    name: ObjectName,
     ctx: CanvasRenderingContext2D,
     x: number,
     y: number,
     size: number
   ) {
-    switch (item) {
+    switch (name) {
       case "empty":
         return;
       case "wall":
@@ -47,7 +47,7 @@ export class Sprites {
         ctx.drawImage(this.monsters, 0, 0, 16, 16, x, y, size, size);
         break;
       default:
-        const [tileX, tileY] = objectTypeToItemTile[item];
+        const [tileX, tileY] = objectTypeToItemTile[name];
         ctx.drawImage(
           this.items,
           tileX * 16,

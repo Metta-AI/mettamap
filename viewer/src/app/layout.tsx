@@ -1,6 +1,10 @@
 import "./globals.css";
 
-import { FC, PropsWithChildren, Suspense } from "react";
+import {
+  FC,
+  PropsWithChildren,
+  Suspense,
+} from "react";
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -42,7 +46,7 @@ const TopMenu: FC = () => {
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
-      <body>
+      <body className="overflow-y-scroll">
         <GlobalProviders>
           <div className="flex h-screen flex-col">
             <TopMenu />

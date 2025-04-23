@@ -18,6 +18,7 @@ import {
 
 type Props = {
   grid: MettaGrid;
+  onCellHover?: (cell: { x: number; y: number } | null) => void;
 };
 
 const Overlay: FC<{
@@ -36,13 +37,12 @@ const Overlay: FC<{
         top: selectedCell?.y * cellSize,
         width: cellSize + 2,
         height: cellSize + 2,
-        // backgroundColor: "rgba(255, 255, 255, 0.2)",
       }}
     ></div>
   );
 };
 
-export const MapViewer: FC<Props> = ({ grid }) => {
+export const MapViewer: FC<Props> = ({ grid, onCellHover }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -138,6 +138,7 @@ export const MapViewer: FC<Props> = ({ grid }) => {
         x: Math.floor(x),
         y: Math.floor(y),
       });
+      onCellHover?.({ x: Math.floor(x), y: Math.floor(y) });
     },
     [zoom, cellSize, grid]
   );
@@ -154,25 +155,29 @@ export const MapViewer: FC<Props> = ({ grid }) => {
         setZoom(1);
         setPan({ x: 0, y: 0 });
       }}
-      className="relative h-full w-full cursor-grab bg-gray-100"
+      className="h-full w-full cursor-grab bg-gray-100"
     >
-      <canvas
-        ref={canvasRef}
-        onMouseMove={onMouseMove}
-        onMouseLeave={() => setSelectedCell(null)}
-        style={{ transform }}
-        className="mx-auto max-h-full max-w-full border border-gray-300"
-      />
       <div
+        className="position-relative mx-auto max-h-full max-w-full"
         style={{ transform }}
-        className="pointer-events-none absolute inset-0 z-10"
       >
-        {canvasRef.current && selectedCell && (
-          <Overlay
-            cellSize={canvasRef.current?.clientWidth / grid.width}
-            selectedCell={selectedCell}
-          />
-        )}
+        <canvas
+          ref={canvasRef}
+          onMouseMove={onMouseMove}
+          onMouseLeave={() => {
+            setSelectedCell(null);
+            onCellHover?.(null);
+          }}
+          className="max-h-full max-w-full border border-gray-300"
+        />
+        <div className="pointer-events-none absolute inset-0 z-10">
+          {canvasRef.current && selectedCell && (
+            <Overlay
+              cellSize={canvasRef.current?.clientWidth / grid.width}
+              selectedCell={selectedCell}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

@@ -43,22 +43,14 @@ export async function drawGrid({
   }
 
   // Draw the map
-  ctx.fillStyle = "black";
-  for (let y = 0; y < grid.height; y++) {
-    for (let x = 0; x < grid.width; x++) {
-      const objectType = grid.object(x, y);
-      if (objectType === "empty") continue;
-      sprites.draw(objectType, ctx, x * cellSize, y * cellSize, cellSize);
-    }
+  for (const object of grid.objects) {
+    const objectType = object.name;
+    sprites.draw(
+      objectType,
+      ctx,
+      object.c * cellSize,
+      object.r * cellSize,
+      cellSize
+    );
   }
-
-  // if (selectedCell) {
-  //   ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
-  //   ctx.fillRect(
-  //     selectedCell.x * cellSize,
-  //     selectedCell.y * cellSize,
-  //     cellSize,
-  //     cellSize
-  //   );
-  // }
 }

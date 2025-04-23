@@ -1,72 +1,22 @@
 import {
   FC,
-  Reducer,
   useCallback,
   useEffect,
-  useReducer,
   useState,
 } from "react";
-
-import { MettaGrid } from "@/lib/MettaGrid";
 
 import { Button } from "../Button";
 import { MapViewer } from "../MapViewer";
 import { MessagesViewer } from "./MessagesViewer";
-import {
-  MettagridMessage,
-  MettagridSocket,
-} from "./socket";
-
-type PlayerState = {
-  messages: MettagridMessage[];
-  map?: MettaGrid;
-  step: number;
-};
-
-type PlayerAction = {
-  type: "add_message";
-  message: MettagridMessage;
-};
-
-const MAX_MESSAGES = 20; // would run out of memory in long sessions otherwise
-
-const playerReducer: Reducer<PlayerState, PlayerAction> = (
-  state: PlayerState,
-  action: PlayerAction
-) => {
-  switch (action.type) {
-    case "add_message":
-      switch (action.message.type) {
-        case "initial_state":
-          return {
-            ...state,
-            messages: [...state.messages, action.message].slice(-MAX_MESSAGES),
-            map: MettaGrid.fromWebsocketObjects(action.message.objects),
-          };
-        case "step_results":
-          return {
-            ...state,
-            messages: [...state.messages, action.message].slice(-MAX_MESSAGES),
-            map: MettaGrid.fromWebsocketObjects(action.message.objects),
-            step: state.step + 1,
-          };
-        default:
-          return state;
-      }
-  }
-};
-
-function usePlayerReducer(initialState: PlayerState) {
-  const [state, dispatch] = useReducer(playerReducer, initialState);
-  return [state, dispatch] as const;
-}
+import { ObjectDetails } from "./ObjectDetails";
+import { usePlayerReducer } from "./reducer";
+import { MettagridSocket } from "./socket";
 
 export const MettaPlayerSession: FC<{ args: string }> = ({ args }) => {
   const [socket, setSocket] = useState<MettagridSocket | null>(null);
 
   const [state, dispatch] = usePlayerReducer({
     messages: [],
-    map: "",
     step: 0,
   });
 
@@ -105,13 +55,24 @@ export const MettaPlayerSession: FC<{ args: string }> = ({ args }) => {
   //   }
   // }, [socket, state.step]);
 
+  const [hoveredCell, setHoveredCell] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const hoveredObject = hoveredCell
+    ? state.map?.object(hoveredCell.x, hoveredCell.y)
+    : null;
+
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="grid min-h-0 flex-1 grid-cols-2 gap-4">
         <div className="min-h-0 overflow-auto">
-          {state.map && <MapViewer grid={state.map} />}
+          {state.map && (
+            <MapViewer grid={state.map} onCellHover={setHoveredCell} />
+          )}
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex min-h-0 flex-col gap-4">
           <div className="flex flex-row items-center gap-4">
             {socket?.socket.readyState === WebSocket.OPEN ? (
               <>
@@ -131,7 +92,10 @@ export const MettaPlayerSession: FC<{ args: string }> = ({ args }) => {
               <div>Connecting...</div>
             )}
           </div>
-          <div className="overflow-y-auto">
+          <div className="flex-1 overflow-y-auto border-b border-gray-200">
+            {hoveredObject && <ObjectDetails object={hoveredObject} />}
+          </div>
+          <div className="flex-1 shrink overflow-y-auto">
             <MessagesViewer messages={state.messages} />
           </div>
         </div>
