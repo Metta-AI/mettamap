@@ -65,6 +65,12 @@ export default function TryViewer() {
           title="Selected"
         />
       </div>
+      <div className="mt-10 h-30 w-60 border">
+        <MapViewer grid={grid} />
+      </div>
+      <div className="mt-10 h-60 w-30 border">
+        <MapViewer grid={grid} />
+      </div>
     </div>
   );
 }

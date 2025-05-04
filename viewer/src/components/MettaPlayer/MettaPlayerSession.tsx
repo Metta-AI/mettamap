@@ -117,7 +117,7 @@ export const MettaPlayerSession: FC<{ args: string }> = ({ args }) => {
 
   return (
     <div className="grid h-full min-h-0 flex-1 grid-cols-2 gap-4">
-      <div className="min-h-0 overflow-auto">
+      <div className="min-h-0">
         {state.map && (
           <MapViewer
             grid={state.map}

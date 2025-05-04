@@ -209,12 +209,9 @@ export const MapViewer: FC<Props> = ({
         setZoom(1);
         setPan({ x: 0, y: 0 });
       }}
-      className="h-full w-full cursor-grab bg-gray-100"
+      className="flex h-full w-full cursor-grab items-start justify-center overflow-hidden bg-gray-100"
     >
-      <div
-        className="position-relative mx-auto max-h-full max-w-full"
-        style={{ transform }}
-      >
+      <div className="relative max-h-full max-w-full" style={{ transform }}>
         <canvas
           ref={canvasRef}
           onMouseMove={onMouseMove}
@@ -223,7 +220,7 @@ export const MapViewer: FC<Props> = ({
             onCellHover?.(undefined);
           }}
           onClick={onMouseClick}
-          className="max-h-full max-w-full border border-gray-300"
+          className="h-full max-h-full w-full max-w-full"
         />
         <div className="pointer-events-none absolute inset-0 z-10">
           {canvasRef.current && (
