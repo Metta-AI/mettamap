@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Code from https://github.com/wouterraateland/use-pan-and-zoom.
  *

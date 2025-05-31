@@ -1,20 +1,4 @@
-const asciiToObjectName = {
-  " ": "empty",
-  "#": "wall",
-  A: "agent",
-  C: "converter",
-  g: "mine",
-  c: "generator",
-  a: "altar",
-  r: "armory",
-  l: "lasery",
-  b: "lab",
-  f: "factory",
-  t: "temple",
-  v: "converter",
-} as const;
-
-const objectTypes: [ObjectName, string][] = [
+const objectTypes = [
   ["agent", "A"], // 0
   ["wall", "#"], // 1
   ["mine", "g"], // 2
@@ -26,14 +10,13 @@ const objectTypes: [ObjectName, string][] = [
   ["factory", "f"], // 8
   ["temple", "t"], // 9
   ["converter", "v"], // 10
-] as const;
+] as const satisfies [string, string][] ;
 
 const asciiToTypeId = Object.fromEntries(
-  objectTypes.map(([_, ascii], i) => [ascii, i])
+  objectTypes.map(([, ascii], i) => [ascii, i])
 );
 
-export type ObjectName =
-  (typeof asciiToObjectName)[keyof typeof asciiToObjectName];
+export type ObjectName = (typeof objectTypes)[number][0] | "empty";
 
 export type ItemObjectName = Exclude<ObjectName, "wall" | "agent" | "empty">;
 

@@ -48,6 +48,7 @@ export class Sprites {
         // orientation: 0 = Up, 1 = Down, 2 = Left, 3 = Right
         // sprites: 0 = Right, 1 = Up, 2 = Down, 3 = Left
         const tileX = [1, 2, 3, 0][
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (object.other as any)["agent:orientation"] ?? 0
         ];
         const tileY = 0; // TODO: agent.group
